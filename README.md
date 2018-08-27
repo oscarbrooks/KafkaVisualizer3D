@@ -1,7 +1,12 @@
 # Kafka Visualizer 3D
 A 3D Visualiser for looking at kafka topics, made with Unity.
 
-![Add a consumer](./Assets/Media/ConsumerMenu_1.png)
+Add a consumer
+
+![Add a consumer](./Assets/Media/ConsumerMenu_1.png "title")
+
+Watch it spit out 'messages'
+
 ![Watch it spit out 'messages'](./Assets/Media/VisualizerEarlyScreenshot.png)
 
 # Instructions
