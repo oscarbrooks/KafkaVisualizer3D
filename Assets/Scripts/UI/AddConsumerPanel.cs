@@ -12,6 +12,9 @@
         private InputField _serversInput;
 
         [SerializeField]
+        private Dropdown _keyTypeDropdown;
+
+        [SerializeField]
         private InputField _topicInput;
 
         [SerializeField]
@@ -42,6 +45,7 @@
             {
                 Servers = _serversInput.text,
                 Topic = _topicInput.text,
+                KeyType = _keyTypeDropdown.options[_keyTypeDropdown.value].text,
                 PollingRateMs = pollingRate
             };
 

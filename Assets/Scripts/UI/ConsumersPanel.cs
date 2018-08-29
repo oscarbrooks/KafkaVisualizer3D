@@ -22,12 +22,12 @@
 
             ConsumersManager.Instance.ConsumerAdded += OnConsumerAdded;
 	    }
-	
+
 	    private void Update () {
 
 	    }
 
-        private void OnConsumerAdded(KafkaConsumer kafkaConsumer)
+        private void OnConsumerAdded(IKafkaConsumer kafkaConsumer)
         {
             Debug.Log("Picked Up");
             var listItem = Instantiate(_consumerListItemPrefab, _scrollViewContent.transform)

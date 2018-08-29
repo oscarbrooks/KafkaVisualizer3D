@@ -5,13 +5,12 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public class KafkaConsumer : MonoBehaviour
+public class KafkaConsumer<T> : MonoBehaviour, IKafkaConsumer
 {
-    private Consumer<Null, string> _consumer;
+    private Consumer<T, string> _consumer;
 
     public ConsumerConfig Config { get; set; }
 
-    [SerializeField]
     private ParticleSystem _particleSystem;
 
     private const string ConsumerGroupId = "kafka-visualizer-3d";
@@ -24,7 +23,7 @@ public class KafkaConsumer : MonoBehaviour
             { "bootstrap.servers", Config.Servers }
         };
 
-        _consumer = new Consumer<Null, string>(conf, null, new StringDeserializer(Encoding.UTF8));
+        _consumer = new Consumer<T, string>(conf, null, new StringDeserializer(Encoding.UTF8));
 
         _consumer.OnMessage += OnMessage;
 
@@ -43,9 +42,10 @@ public class KafkaConsumer : MonoBehaviour
     {
     }
 
-    public void Configure(ConsumerConfig config)
+    public void Configure(ConsumerConfig config, GameObject particleSystemPrefab)
     {
         Config = config;
+        _particleSystem = Instantiate(particleSystemPrefab, transform).GetComponent<ParticleSystem>();
     }
 
     private IEnumerator Poll()
@@ -60,7 +60,7 @@ public class KafkaConsumer : MonoBehaviour
         }
     }
 
-    private void OnMessage(object _, Message<Null, string> msg)
+    private void OnMessage(object _, Message<T, string> msg)
     {
         Debug.Log($"Read '{msg.Value}' from: {msg.TopicPartitionOffset}");
         _particleSystem.Emit(1);
