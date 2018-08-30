@@ -2,5 +2,6 @@
 
 public interface IKafkaConsumer {
     ConsumerConfig Config { get; set; }
-    void Configure(ConsumerConfig config, GameObject particleSystemPrefab);
+    void ConfigureConsumer(ConsumerConfig config);
+    void Initialize(GameObject particleSystemPrefab);
 }

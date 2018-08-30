@@ -38,39 +38,18 @@ public class ConsumersManager : MonoBehaviour {
 
     public void AddConsumer(ConsumerConfig config)
     {
-
         var consumerObj = new GameObject("Consumer-" + config.Topic);
         consumerObj.transform.position = _consumerSpawn.position;
 
-        var kafkaConsumer = AttatchKafkaConsumerComponent(consumerObj, config);
+        var kafkaConsumer = ConsumerFactory.AttatchConsumerComponent(consumerObj, config);
 
-        kafkaConsumer.Configure(config, _particleSystemPrefab);
+        kafkaConsumer.ConfigureConsumer(config);
 
-        Debug.Log("Consumer null? " + (kafkaConsumer == null));
+        kafkaConsumer.Initialize(_particleSystemPrefab);
 
         _consumers.Add(kafkaConsumer);
 
         if(ConsumerAdded != null)
             ConsumerAdded.Invoke(kafkaConsumer);
     }
-
-    private static IKafkaConsumer AttatchKafkaConsumerComponent(GameObject obj, ConsumerConfig config)
-    {
-        switch (config.KeyType.ToLower())
-        {
-            case KafkaConsumerKeyTypes.NullType:
-                return obj.AddComponent<KafkaConsumerNullKey>();
-            case KafkaConsumerKeyTypes.StringType:
-                return obj.AddComponent<KafkaConsumerStringKey>();
-            default:
-                throw new ArgumentException(
-                    string.Format("Kafka consumer key type <{0}> is not of supported type: Null | string"),
-                    config.KeyType
-                );
-        }
-    }
 }
-
-// Generic Monobehaviour workaround
-public class KafkaConsumerNullKey : KafkaConsumer<Confluent.Kafka.Null> { }
-public class KafkaConsumerStringKey : KafkaConsumer<string> { }

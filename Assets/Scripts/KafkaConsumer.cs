@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public class KafkaConsumer<T> : MonoBehaviour, IKafkaConsumer
+public class KafkaConsumer<TKey> : MonoBehaviour, IKafkaConsumer
 {
-    private Consumer<T, string> _consumer;
+    private Consumer<TKey, string> _consumer;
 
     public ConsumerConfig Config { get; set; }
 
@@ -17,13 +17,33 @@ public class KafkaConsumer<T> : MonoBehaviour, IKafkaConsumer
 
     private void Start()
     {
+    }
+
+    private void Update()
+    {
+    }
+
+    public void ConfigureConsumer(ConsumerConfig config)
+    {
+        Config = config;
+
+        CreateConsumer(ConsumerFactory.GetDeserializer<TKey>(config));
+    }
+
+    public void Initialize(GameObject particleSystemPrefab)
+    {
+        _particleSystem = Instantiate(particleSystemPrefab, transform).GetComponent<ParticleSystem>();
+    }
+
+    private void CreateConsumer(IDeserializer<TKey> deserializer)
+    {
         var conf = new Dictionary<string, object>
         {
             { "group.id", ConsumerGroupId },
             { "bootstrap.servers", Config.Servers }
         };
 
-        _consumer = new Consumer<T, string>(conf, null, new StringDeserializer(Encoding.UTF8));
+        _consumer = new Consumer<TKey, string>(conf, deserializer, new StringDeserializer(Encoding.UTF8));
 
         _consumer.OnMessage += OnMessage;
 
@@ -38,16 +58,6 @@ public class KafkaConsumer<T> : MonoBehaviour, IKafkaConsumer
         StartCoroutine(Poll());
     }
 
-    private void Update()
-    {
-    }
-
-    public void Configure(ConsumerConfig config, GameObject particleSystemPrefab)
-    {
-        Config = config;
-        _particleSystem = Instantiate(particleSystemPrefab, transform).GetComponent<ParticleSystem>();
-    }
-
     private IEnumerator Poll()
     {
         while (true)
@@ -60,7 +70,7 @@ public class KafkaConsumer<T> : MonoBehaviour, IKafkaConsumer
         }
     }
 
-    private void OnMessage(object _, Message<T, string> msg)
+    private void OnMessage(object _, Message<TKey, string> msg)
     {
         Debug.Log($"Read '{msg.Value}' from: {msg.TopicPartitionOffset}");
         _particleSystem.Emit(1);
